@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical Records - Medinfo</title>
+</head>
+<body>
+    <h2>Your Medical Records</h2>
+    <div id="records"></div>
+
+    <h3>Add New Record</h3>
+    <input id="date" placeholder="Date" />
+    <input id="diagnosis" placeholder="Diagnosis" />
+    <input id="prescription" placeholder="Prescription" />
+    <input id="doctor" placeholder="Doctor" />
+    <button onclick="addRecord()">Add</button>
+    <button onclick="clearRecords()">Clear All Records</button>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem("user"));
+        let records = [];
+
+        function fetchRecords() {
+            fetch("/individual/record", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.records) {
+                    records = data.records;
+                    renderRecords();
+                } else {
+                    alert(data.message || "Error fetching records.");
+                }
+            });
+        }
+
+        function renderRecords() {
+            const div = document.getElementById("records");
+            div.innerHTML = records.map((r, i) => `
+                <p>
+                    <b>Date:</b> ${r.date}<br>
+                    <b>Diagnosis:</b> ${r.diagnosis}<br>
+                    <b>Prescription:</b> ${r.prescription}<br>
+                    <b>Doctor:</b> ${r.doctor}<br>
+                    <button onclick="deleteRecord(${i})">Delete</button>
+                </p>
+                <hr>
+            `).join("");
+        }
+
+        function addRecord() {
+            const newRecord = {
+                date: document.getElementById("date").value,
+                diagnosis: document.getElementById("diagnosis").value,
+                prescription: document.getElementById("prescription").value,
+                doctor: document.getElementById("doctor").value
+            };
+
+            records.push(newRecord);
+            updateRecords();
+        }
+
+        function deleteRecord(index) {
+            records.splice(index, 1);
+            updateRecords();
+        }
+
+        function clearRecords() {
+            if (confirm("Are you sure you want to clear all records?")) {
+                fetch("/individual/record", {
+                    method: "DELETE",
+                    credentials: "include"
+                }).then(res => res.json())
+                  .then(data => {
+                      alert(data.message);
+                      records = [];
+                      renderRecords();
+                  });
+            }
+        }
+
+        function updateRecords() {
+            fetch("/individual/record", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ records })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                renderRecords();
+            });
+        }
+
+        fetchRecords();
+    </script>
+</body>
+</html>

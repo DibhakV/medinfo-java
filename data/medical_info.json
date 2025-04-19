@@ -1,0 +1,33 @@
+[
+    {
+      "aadhar": "111122223333",
+      "name": "Mariyaan",
+      "records": [
+        {
+          "date": "2024-12-20",
+          "diagnosis": "Fever and cold",
+          "prescription": "Paracetamol 500mg",
+          "doctor": "Dr. Pavin Cletus Bavith Mariyaan"
+        },
+        {
+          "date": "2025-01-15",
+          "diagnosis": "Mild hypertension",
+          "prescription": "Amlodipine 5mg",
+          "doctor": "Dr. J B Babin"
+        }
+      ]
+    },
+    {
+      "aadhar": "444455556666",
+      "name": "Suman Adhithya",
+      "records": [
+        {
+          "date": "2025-02-02",
+          "diagnosis": "Tooth pain",
+          "prescription": "Love",
+          "doctor": "Dr. Saranya ponvannan"
+        }
+      ]
+    }
+  ]
+  

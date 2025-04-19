@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Panel - Medinfo</title>
+</head>
+<body>
+    <h2>Access Patient Records</h2>
+    <input id="aadhar_search" placeholder="Enter Aadhar Number" />
+    <button onclick="fetchUser()">Fetch Records</button>
+
+    <div id="user_info" style="margin-top: 20px;"></div>
+
+    <h3>Add New Record</h3>
+    <input id="date" placeholder="Date" />
+    <input id="diagnosis" placeholder="Diagnosis" />
+    <input id="prescription" placeholder="Prescription" />
+    <input id="doctor" placeholder="Doctor" />
+    <button onclick="addRecord()">Add</button>
+    <button onclick="clearRecords()">Clear All</button>
+
+    <script>
+        let currentUser = {};
+        let currentAadhar = "";
+
+        function fetchUser() {
+            const aadhar = document.getElementById("aadhar_search").value;
+            fetch(`/hospital/records/${aadhar}`, {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    document.getElementById("user_info").innerHTML = "";
+                } else {
+                    currentUser = data;
+                    currentAadhar = aadhar;
+                    renderUser();
+                }
+            });
+        }
+
+        function renderUser() {
+            const div = document.getElementById("user_info");
+            const recordsHtml = currentUser.records.map((r, i) => `
+                <p>
+                    <b>Date:</b> ${r.date}<br>
+                    <b>Diagnosis:</b> ${r.diagnosis}<br>
+                    <b>Prescription:</b> ${r.prescription}<br>
+                    <b>Doctor:</b> ${r.doctor}<br>
+                    <button onclick="deleteRecord(${i})">Delete</button>
+                </p><hr>
+            `).join("");
+
+            div.innerHTML = `
+                <h3>${currentUser.name} (${currentUser.aadhar})</h3>
+                ${recordsHtml}
+            `;
+        }
+
+        function addRecord() {
+            const newRecord = {
+                date: document.getElementById("date").value,
+                diagnosis: document.getElementById("diagnosis").value,
+                prescription: document.getElementById("prescription").value,
+                doctor: document.getElementById("doctor").value
+            };
+            currentUser.records.push(newRecord);
+            updateUser();
+        }
+
+        function deleteRecord(index) {
+            currentUser.records.splice(index, 1);
+            updateUser();
+        }
+
+        function clearRecords() {
+            if (confirm("Clear all records for this user?")) {
+                fetch(`/hospital/records/${currentAadhar}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    currentUser.records = [];
+                    renderUser();
+                });
+            }
+        }
+
+        function updateUser() {
+            fetch(`/hospital/records/${currentAadhar}`, {
+                method: "PUT",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ records: currentUser.records })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                renderUser();
+            });
+        }
+    </script>
+</body>
+</html>

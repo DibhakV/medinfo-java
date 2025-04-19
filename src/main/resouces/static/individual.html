@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Individual - Medinfo</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <input id="reg_name" placeholder="Name" />
+    <input id="reg_aadhar" placeholder="Aadhar" />
+    <button onclick="register()">Register</button>
+
+    <h2>Login</h2>
+    <input id="login_aadhar" placeholder="Aadhar" />
+    <button onclick="login()">Login</button>
+
+    <script>
+        function register() {
+            const name = document.getElementById("reg_name").value;
+            const aadhar = document.getElementById("reg_aadhar").value;
+
+            fetch("/individual/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, aadhar, records: [] })
+            }).then(res => res.json()).then(data => alert(data.message));
+        }
+
+        function login() {
+            const aadhar = document.getElementById("login_aadhar").value;
+
+            fetch("/individual/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ aadhar })
+            }).then(res => res.json()).then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert("Login successful!");
+                    localStorage.setItem("user", JSON.stringify(data));
+                    window.location.href = "records.html";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
