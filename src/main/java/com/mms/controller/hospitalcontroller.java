@@ -17,6 +17,7 @@ public class HospitalController {
     private final ObjectMapper mapper = new ObjectMapper();
     private final File dbFile = new File("/tmp/medical_info.json");
 
+
     private final String hospitalUsername = "admin";
     private final String hospitalPassword = "password";
 
